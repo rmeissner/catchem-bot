@@ -186,7 +186,7 @@ app.get('/test', runAsyncWrapper(function (req, res, next) { return __awaiter(vo
                 return [4 /*yield*/, loadBot()];
             case 8:
                 bot_1 = _a.sent();
-                return [4 /*yield*/, bot_1.sendMessage(channelId, "A wild " + names[kind - 1] + " appeared! Fast catch it http://catchem.thegerman.de/#/zone", { parse_mode: 'Markdown' })];
+                return [4 /*yield*/, bot_1.sendMessage(channelId, "A wild " + names[kind - 1] + " appeared!", { parse_mode: 'Markdown' })];
             case 9:
                 _a.sent();
                 return [3 /*break*/, 17];
@@ -207,7 +207,7 @@ app.get('/test', runAsyncWrapper(function (req, res, next) { return __awaiter(vo
                 return [4 /*yield*/, loadBot()];
             case 15:
                 bot_2 = _a.sent();
-                return [4 /*yield*/, bot_2.sendMessage(channelId, "Wanna catch 'em all? Then place a bait! http://catchem.thegerman.de/#/zone", { parse_mode: 'Markdown' })];
+                return [4 /*yield*/, bot_2.sendMessage(channelId, "Wanna catch 'em all? Then place a bait!", { parse_mode: 'Markdown' })];
             case 16:
                 _a.sent();
                 _a.label = 17;
