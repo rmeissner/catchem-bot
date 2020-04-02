@@ -101,8 +101,32 @@ var loadChannel = function () { return __awaiter(void 0, void 0, void 0, functio
         }
     });
 }); };
+var loadEthKey = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var ethKey, key, secret, e_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                ethKey = process.env.ETH_SECRET_KEY;
+                if (!!ethKey) return [3 /*break*/, 4];
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                key = datastore.key(['Secret', 'ethKey']);
+                return [4 /*yield*/, datastore.get(key)];
+            case 2:
+                secret = (_a.sent())[0];
+                ethKey = secret.value;
+                return [3 /*break*/, 4];
+            case 3:
+                e_1 = _a.sent();
+                console.error(e_1);
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/, ethKey];
+        }
+    });
+}); };
 var loadCachedKind = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var key, cached, e_1;
+    var key, cached, e_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -113,15 +137,15 @@ var loadCachedKind = function () { return __awaiter(void 0, void 0, void 0, func
                 cached = (_a.sent())[0];
                 return [2 /*return*/, cached.lastKind];
             case 2:
-                e_1 = _a.sent();
-                console.log(e_1);
+                e_2 = _a.sent();
+                console.log(e_2);
                 return [2 /*return*/, 0];
             case 3: return [2 /*return*/];
         }
     });
 }); };
 app.get('/test', function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var provider, zone, blockNumber, kindBlockNumber, appearBlockNumber, cachedKind, kind, kindInfo, channelId, bot_1;
+    var provider, zone, blockNumber, kindBlockNumber, appearBlockNumber, cachedKind, kind, kindInfo, channelId, bot_1, mnemonic, wallet, inTheZone, channelId, bot_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -146,7 +170,7 @@ app.get('/test', function (req, res, next) { return __awaiter(void 0, void 0, vo
                 kind = kindInfo.calcKind;
                 _a.label = 5;
             case 5:
-                if (!(cachedKind != kind)) return [3 /*break*/, 11];
+                if (!(cachedKind != kind)) return [3 /*break*/, 18];
                 return [4 /*yield*/, cacheKind(kind)];
             case 6:
                 _a.sent();
@@ -157,23 +181,43 @@ app.get('/test', function (req, res, next) { return __awaiter(void 0, void 0, vo
                 return [4 /*yield*/, loadBot()];
             case 8:
                 bot_1 = _a.sent();
-                return [4 /*yield*/, bot_1.sendMessage(channelId, "A wild " + names[kind - 1] + " appeared", { parse_mode: 'Markdown' })];
+                return [4 /*yield*/, bot_1.sendMessage(channelId, "A wild " + names[kind - 1] + " appeared! Fast catch it http://catchem.thegerman.de/#/zone", { parse_mode: 'Markdown' })];
             case 9:
                 _a.sent();
-                _a.label = 10;
-            case 10:
+                return [3 /*break*/, 17];
+            case 10: return [4 /*yield*/, loadEthKey()];
+            case 11:
+                mnemonic = _a.sent();
+                if (!mnemonic) return [3 /*break*/, 13];
+                wallet = new ethers.Wallet.fromMnemonic(mnemonic);
+                inTheZone = zone.connect(wallet);
+                return [4 /*yield*/, inTheZone.currentKindInfo()];
+            case 12:
+                _a.sent();
+                return [3 /*break*/, 17];
+            case 13: return [4 /*yield*/, loadChannel()];
+            case 14:
+                channelId = _a.sent();
+                return [4 /*yield*/, loadBot()];
+            case 15:
+                bot_2 = _a.sent();
+                return [4 /*yield*/, bot_2.sendMessage(channelId, "Wanna catch 'em all? Then place a bait! http://catchem.thegerman.de/#/zone", { parse_mode: 'Markdown' })];
+            case 16:
+                _a.sent();
+                _a.label = 17;
+            case 17:
                 res
                     .status(200)
                     .send("New kind, " + cachedKind + ", " + kind)
                     .end();
-                return [3 /*break*/, 12];
-            case 11:
+                return [3 /*break*/, 19];
+            case 18:
                 res
                     .status(200)
                     .send("Nothing new, " + kind)
                     .end();
-                _a.label = 12;
-            case 12: return [2 /*return*/];
+                _a.label = 19;
+            case 19: return [2 /*return*/];
         }
     });
 }); });

@@ -70,7 +70,13 @@ const loadCachedKind = async (): Promise<number> => {
     }
 }
 
-app.get('/test', async (req: any, res: any, next: any) => {
+function runAsyncWrapper (callback: any) {
+    return function (req: any, res: any, next: any) {
+        callback(req, res, next).catch(next)
+    }
+}
+
+app.get('/test', runAsyncWrapper(async (req: any, res: any, next: any) => {
     const provider = ethers.getDefaultProvider("rinkeby")
     const zone = new ethers.Contract(zoneData.networks[4].address, zoneData.abi, provider);
     const blockNumber = await provider.getBlockNumber()
@@ -92,12 +98,14 @@ app.get('/test', async (req: any, res: any, next: any) => {
         } else {
             const mnemonic = await loadEthKey()
             if (mnemonic) {
-                const wallet = new ethers.Wallet.fromMnemonic(mnemonic);
-                let inTheZone = zone.connect(wallet);
-                await inTheZone.currentKindInfo();
+                const wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider)
+                let inTheZone = zone.connect(wallet)
+                const tx = await inTheZone.currentKindInfo({ gasLimit: 180000 })
+                console.log(tx.hash)
             } else {
                 const channelId = await loadChannel()
-                await bot.sendMessage(channelId, `Wanna catch 'em all? Then place a bait! http://catchem.thegerman.de/#/zone`, { parse_mode: 'Markdown' })
+                const bot = await loadBot()
+                await bot.sendMessage(channelId, `Wanna catch \'em all? Then place a bait! http://catchem.thegerman.de/#/zone`, { parse_mode: 'Markdown' })
             }
         }
         res
@@ -110,7 +118,7 @@ app.get('/test', async (req: any, res: any, next: any) => {
             .send(`Nothing new, ${kind}`)
             .end();
     }
-});
+}));
 
 const PORT = process.env.PORT || 8090;
 app.listen(PORT, () => {
