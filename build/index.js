@@ -144,8 +144,13 @@ var loadCachedKind = function () { return __awaiter(void 0, void 0, void 0, func
         }
     });
 }); };
-app.get('/test', function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var provider, zone, blockNumber, kindBlockNumber, appearBlockNumber, cachedKind, kind, kindInfo, channelId, bot_1, mnemonic, wallet, inTheZone, channelId, bot_2;
+function runAsyncWrapper(callback) {
+    return function (req, res, next) {
+        callback(req, res, next).catch(next);
+    };
+}
+app.get('/test', runAsyncWrapper(function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var provider, zone, blockNumber, kindBlockNumber, appearBlockNumber, cachedKind, kind, kindInfo, channelId, bot_1, mnemonic, wallet, inTheZone, tx, channelId, bot_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -189,11 +194,12 @@ app.get('/test', function (req, res, next) { return __awaiter(void 0, void 0, vo
             case 11:
                 mnemonic = _a.sent();
                 if (!mnemonic) return [3 /*break*/, 13];
-                wallet = new ethers.Wallet.fromMnemonic(mnemonic);
+                wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
                 inTheZone = zone.connect(wallet);
-                return [4 /*yield*/, inTheZone.currentKindInfo()];
+                return [4 /*yield*/, inTheZone.currentKindInfo({ gasLimit: 180000 })];
             case 12:
-                _a.sent();
+                tx = _a.sent();
+                console.log(tx.hash);
                 return [3 /*break*/, 17];
             case 13: return [4 /*yield*/, loadChannel()];
             case 14:
@@ -220,7 +226,7 @@ app.get('/test', function (req, res, next) { return __awaiter(void 0, void 0, vo
             case 19: return [2 /*return*/];
         }
     });
-}); });
+}); }));
 var PORT = process.env.PORT || 8090;
 app.listen(PORT, function () {
     console.log("App listening on port " + PORT);

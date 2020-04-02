@@ -94,7 +94,7 @@ app.get('/test', runAsyncWrapper(async (req: any, res: any, next: any) => {
         if (kind != 0) {
             const channelId = await loadChannel()
             const bot = await loadBot()
-            await bot.sendMessage(channelId, `A wild ${names[kind - 1]} appeared! Fast catch it http://catchem.thegerman.de/#/zone`, { parse_mode: 'Markdown' })
+            await bot.sendMessage(channelId, `A wild ${names[kind - 1]} appeared!`, { parse_mode: 'Markdown' })
         } else {
             const mnemonic = await loadEthKey()
             if (mnemonic) {
@@ -105,7 +105,7 @@ app.get('/test', runAsyncWrapper(async (req: any, res: any, next: any) => {
             } else {
                 const channelId = await loadChannel()
                 const bot = await loadBot()
-                await bot.sendMessage(channelId, `Wanna catch \'em all? Then place a bait! http://catchem.thegerman.de/#/zone`, { parse_mode: 'Markdown' })
+                await bot.sendMessage(channelId, `Wanna catch \'em all? Then place a bait!`, { parse_mode: 'Markdown' })
             }
         }
         res
