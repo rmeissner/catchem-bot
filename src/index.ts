@@ -45,6 +45,20 @@ const loadChannel = async (): Promise<string> => {
     return channel
 }
 
+const loadEthKey = async (): Promise<string> => {
+    let ethKey = process.env.ETH_SECRET_KEY as string
+    if (!ethKey) {
+        try {
+            const key = datastore.key(['Secret', 'ethKey'])
+            const [secret] = await datastore.get(key);
+            ethKey = secret.value
+        } catch (e) {
+            console.error(e)
+        }
+    }
+    return ethKey
+}
+
 const loadCachedKind = async (): Promise<number> => {
     try {
         const key = datastore.key(['Cache', 'lastKind'])
@@ -74,7 +88,17 @@ app.get('/test', async (req: any, res: any, next: any) => {
         if (kind != 0) {
             const channelId = await loadChannel()
             const bot = await loadBot()
-            await bot.sendMessage(channelId, `A wild ${names[kind - 1]} appeared`, { parse_mode: 'Markdown' })
+            await bot.sendMessage(channelId, `A wild ${names[kind - 1]} appeared! Fast catch it http://catchem.thegerman.de/#/zone`, { parse_mode: 'Markdown' })
+        } else {
+            const mnemonic = await loadEthKey()
+            if (mnemonic) {
+                const wallet = new ethers.Wallet.fromMnemonic(mnemonic);
+                let inTheZone = zone.connect(wallet);
+                await inTheZone.currentKindInfo();
+            } else {
+                const channelId = await loadChannel()
+                await bot.sendMessage(channelId, `Wanna catch 'em all? Then place a bait! http://catchem.thegerman.de/#/zone`, { parse_mode: 'Markdown' })
+            }
         }
         res
             .status(200)
