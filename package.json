@@ -19,7 +19,7 @@
   "dependencies": {
     "@google-cloud/datastore": "^5.1.0",
     "ethers": "^4.0.46",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "node-telegram-bot-api": "^0.40.0"
   },
   "devDependencies": {
